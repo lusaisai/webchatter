@@ -1,0 +1,68 @@
+extends window
+
+block title
+	span(class="talk-to" name="#{friend.name}" email="#{friend.email}") Conversation with #{friend.name}
+
+block body
+	div.messages
+		for message in messages
+			h6 #{message.time} #{friend.name} says: 
+			p(class="your-text #{friend.name}-text") #{message.message}
+
+	script.
+		Button = $("#user-panel button[email='#{friend.email}']");
+		Button.find('.badge').remove();
+		var Messages = $( "##{id} .messages" );
+		Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
+
+	form( method="post", action="/talkto/#{friend.email}", class="form-inline" role="form")
+		div.row
+			div.col-xs-10
+				input(type="text", style="width: 100%" id="message", name="message", class="my-text #{me.name}-text form-control", autocomplete="off", placeholder="Type your message")
+			div.col-xs-2
+				button(type="submit", class="btn btn-primary" ) Send
+
+	script.
+		$( "##{id} form" ).submit(function(e){
+			e.preventDefault();
+
+			var Input = $(this).find('input');
+			var message = $.trim(Input.val());
+			if ( message == "" ) return;
+			var Messages = $( "##{id} .messages" );
+			$.ajax({
+				type: "POST",
+				url: "/talkto/#{friend.email}",
+				data: {message: message}
+			})
+			.done(function() {
+				Messages.append( '<h6>' + format_time(new Date()) + ' ' + "#{me.name} says:" + '</h6>' );
+				Messages.append( '<p class="my-text #{me.name}-text">' + message + "</p>" );
+				Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
+			})
+			.fail(function() {
+				var time = new Date();
+				Messages.append( '<p class="fail-text"> failed to send: ' + message + "</p>" );
+				Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
+			})
+			;
+			Input.val("");
+			Input.focus();
+		});
+
+		var format_time = function(t) {
+			var time = t.getFullYear();
+			if ( t.getMonth() < 10 ) {time = time + '-0' + t.getMonth() } 
+			else { time = time + '-' + t.getMonth() }
+			if ( t.getDay() < 10 ) {time = time + '-0' + t.getDay() } 
+			else { time = time + '-' + t.getDay() }
+
+			if ( t.getHours() < 10 ) {time = time + ' 0' + t.getHours() } 
+			else { time = time + ' ' + t.getHours() }
+			if ( t.getMinutes() < 10 ) {time = time + ':0' + t.getMinutes() } 
+			else { time = time + ':' + t.getMinutes() }
+			if ( t.getSeconds() < 10 ) {time = time + ':0' + t.getSeconds() } 
+			else { time = time + ':' + t.getSeconds() }
+
+			return time;
+		};

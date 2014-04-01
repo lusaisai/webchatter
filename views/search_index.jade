@@ -1,0 +1,19 @@
+extends window
+
+block title
+	span Search a user
+
+block body
+	input(type="text", class="search form-control", placeholder="lusaisai@163.com")
+	div.result
+
+block javascript
+	script.
+		$( "##{id} .search" ).keyup(function(){
+			var email = $.trim($(this).val());
+			if ( email == '' ) {
+				$( "##{id} .result" ).empty();
+				return;
+			}
+			$( "##{id} .result" ).load('/panel/search', {email: email});
+		});

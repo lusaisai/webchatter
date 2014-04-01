@@ -1,0 +1,20 @@
+extends layout
+
+block content
+	div.col-md-2
+	div.col-md-8
+		form( method="post", action="/signin", class="form-inline" role="form")
+			legend Welcome to #{settings.appname}
+			input(type="text", id="email", name="email", class="form-control", placeholder="Email")
+			input(type="password", id="password", name="password", class="form-control", placeholder="Password")
+			div.checkbox: label
+				input(type="checkbox", id="remember", name="remember") 
+				span Remember me
+			button(type="submit", class="btn btn-primary" ) Sign In
+			a(href="/signup" style="margin-left:10px") or register a new account
+
+		if data
+			if data.email
+				script $('#email').attr('value', '#{data.email}');
+			if data.error
+				div(class="alert alert-danger") #{data.error}

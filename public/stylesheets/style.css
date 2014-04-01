@@ -1,0 +1,65 @@
+.window {
+	position: absolute;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	width: 640px;
+	background-color: #ffffff;
+}
+
+.window-fore {
+	z-index: 100;
+}
+
+.window-back {
+	z-index: 50;
+}
+
+.window .main {
+	height: 400px;
+}
+
+.window-fore .titler {
+	background-color: #dff0d8;
+}
+.window-back .titler {
+	background-color: #fcf8e3;
+}
+.window-note .titler {
+	background-color: #28b62c;
+}
+
+.titler:hover {
+	cursor: move;
+}
+
+#friends {
+	max-height: 800px;
+	overflow-y: scroll;
+}
+
+.friend {
+	width: 100%;
+}
+
+.messages, .scroll-sub-window {
+	width: 100%;
+	height: 100%;
+	background-color: #ffffff;
+	overflow-y: scroll;
+}
+
+
+.fail-text {
+	color: #b94a48;
+}
+
+.my-text {
+	font-size: 16px;
+	color: #666666;
+	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
+.your-text {
+	font-size: 16px;
+	color: #033c73;
+	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}

@@ -1,0 +1,38 @@
+extends window
+
+block title
+	span Manage groups
+
+block body
+	div(class="scroll-sub-window"): div
+		button(id="new-group", type="button", class="btn btn-success btn-sm") New Group
+		div#manage-groups
+			include manage_group_list
+		script.
+			$('#new-group').click(function(){
+				$(this).after('<div class="form-inline new-group-form"><input type="text" class="form-control" placeholder="New group name"><button type="cancel" class="btn btn-default">Cancel</button><button type="submit" class="btn btn-primary">Submit</button></div>');
+			});
+			$("##{id}").on('click', '.new-group-form button[type="cancel"]', function(){
+				$(this).closest('div.new-group-form').remove();
+			} );
+			$("##{id}").on('click', '.new-group-form button[type="submit"]', function(){
+				var Form = $(this).closest('div.new-group-form');
+				var text = $.trim(Form.find('input').val());
+				var that = this;
+				if(text=="") return;
+				$.ajax({
+					cache: false,
+					type: "POST",
+					url: '/panel/group/new',
+					data: {name: text}
+				})
+				.done(function(data) {
+					$('#manage-groups').load('/panel/manage_group_list');
+					Form.remove();
+				})
+				.fail(function( jqXHR, textStatus, errorThrown){
+					var html = '<div class="alert alert-dismissable alert-danger">' + '<button type="button" class="close" data-dismiss="alert">×</button>' + jqXHR.responseText +'</div>';
+					Form.after(html);
+				})
+				;
+			} );

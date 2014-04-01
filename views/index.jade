@@ -1,0 +1,74 @@
+extends layout
+
+block content
+	div.row
+		div(class="col-md-3" id="user-panel")
+			a(href="/")
+				button(class="btn btn-primary btn-lg btn-block" ) #{me.name}
+			div(id="toolbar" class="btn-group")
+				button(id="search-user" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-default", title="Search users")
+					span(class="fa fa-search")
+				button(id="notifications" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-default", title="Notifications")
+					span(class="fa fa-envelope")
+				button(id="groups" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-default", title="Manage Groups")
+					span(class="fa fa-group")
+				button(id="set-note-sound", data-play="true" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-default", title="Click to disable sound notification")
+					span(class="fa fa-volume-up")
+				script.
+					$('#set-note-sound').click(function(){
+						if( $(this).attr('data-play') == 'true' ) {
+							$(this).attr('data-play', 'false');
+							$(this).attr('title', 'Click to enable sound notification');
+							$(this).empty().append('<span class="fa fa-volume-off"></span>');
+						} else {
+							$(this).attr('data-play', 'true');
+							$(this).attr('title', 'Click to disable sound notification');
+							$(this).empty().append('<span class="fa fa-volume-up"></span>');
+						}
+					});
+				a(href="/signout")
+					button(id="logout" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-danger", title="Sign out")
+						span(class="fa fa-sign-out")
+			div(id="friends" class="panel panel-primary")
+				div.panel-heading
+					input(type="text", id="filter", class="form-control")
+				div.panel-body#friend-list
+					include friend_list.jade
+			audio(id="note-sound" style="display:none")
+				source(src="/sound/notification.mp3", type="audio/mpeg")
+				source(src="/sound/notification.ogg", type="audio/ogg")
+
+		div(id="desktop" class="col-md-9")
+
+
+	script(type="text/javascript", src="/javascripts/live.js")
+	script.
+		$('#filter').keyup(function(){
+			var text = $.trim($(this).val());
+			var Friends = $("#user-panel .friend");
+			Friends.css('display', 'block');
+			if( text != "" ) {
+				Friends.each(function(){
+					if( $(this).attr('name').indexOf(text) < 0 ) {
+						$(this).css('display', 'none');
+					}
+				});
+			}
+		});
+		$('#search-user').click(function(){
+			$.get( '/panel/search', function(data){
+				$('#desktop').append(data);
+			} );
+		});
+
+		$('#notifications').click(function(){
+			$.get( '/panel/notifications', function(data){
+				$('#desktop').append(data);
+			} );
+		});
+
+		$('#groups').click(function(){
+			$.get( '/panel/manage_groups', function(data){
+				$('#desktop').append(data);
+			} );
+		});

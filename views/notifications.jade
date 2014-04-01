@@ -1,0 +1,92 @@
+extends window
+
+block title
+	span Notifications
+
+block body
+	if me.notifications.friend_requests && me.notifications.friend_requests.length > 0
+		h5 You have friend requests
+		for request in me.notifications.friend_requests
+			div.notification-item
+				span #{request}
+				button(type="button", class="accept-request btn btn-primary btn-xs", title="accept request")
+					<span class="glyphicon glyphicon-ok"></span>
+				button(type="button", class="deny-request btn btn-primary btn-xs", title="deny request")
+					<span class="glyphicon glyphicon-remove"></span>
+	if me.notifications.friend_accepts && me.notifications.friend_accepts.length > 0
+		h5 Your friend request has been accepted
+		for info in me.notifications.friend_accepts
+			div.notification-item
+				span #{info}
+				button(type="button", class="accepted btn btn-primary btn-xs")
+					<span class="glyphicon glyphicon-trash"></span>
+	if me.notifications.friend_denies && me.notifications.friend_denies.length > 0
+		h5 Your friend request has been denied
+		for info in me.notifications.friend_denies
+			div.notification-item
+				span #{info}
+				button(type="button", class="denied btn btn-primary btn-xs")
+					<span class="glyphicon glyphicon-trash"></span>
+	if me.notifications.friend_deletes && me.notifications.friend_deletes.length > 0
+		h5 They have removed you from their friend list
+		for info in me.notifications.friend_deletes
+			div.notification-item
+				span #{info}
+				button(type="button", class="deleted btn btn-primary btn-xs")
+					<span class="glyphicon glyphicon-trash"></span>
+	if me.notifications.group_drops && me.notifications.group_drops.length > 0
+		h5 The following groups have been dropped by their owners
+		for info in me.notifications.group_drops
+			div.notification-item
+				span #{info}
+				button(type="button", class="group-dropped btn btn-primary btn-xs")
+					<span class="glyphicon glyphicon-trash"></span>
+	if me.notifications.group_member_adds && me.notifications.group_member_adds.length > 0
+		h5 You have been added to the following groups
+		for info in me.notifications.group_member_adds
+			div.notification-item
+				span #{info}
+				button(type="button", class="group-member-added btn btn-primary btn-xs")
+					<span class="glyphicon glyphicon-trash"></span>
+	if me.notifications.group_member_removes && me.notifications.group_member_removes.length > 0
+		h5 You have been removed to the following groups
+		for info in me.notifications.group_member_removes
+			div.notification-item
+				span #{info}
+				button(type="button", class="group-member-removed btn btn-primary btn-xs")
+					<span class="glyphicon glyphicon-trash"></span>
+
+
+
+	script.
+		(function(){
+			var notification_handler = function( url, other_data, refresh_friend_list ) {
+				return function(){
+					var Item = $(this).closest('div.notification-item');
+					var email = Item.find('span').text();
+					var data = {email: email};
+					for (var attrname in other_data) { data[attrname] = other_data[attrname]; }
+					$.ajax({
+						cache: false,
+						type: "POST",
+						url: url,
+						data: data
+					})
+					.done(function() {
+						Item.remove();
+						if(refresh_friend_list) $('#friend-list').load('/friend_list');
+					});
+				};
+			};
+
+			$("##{id} .accept-request").click(notification_handler( "/panel/handle_friend_request", {accept_friend: true}, true ));
+			$("##{id} .deny-request").click(notification_handler( "/panel/handle_friend_request", {accept_friend: false}, false ));
+			
+			$("##{id} .accepted").click(notification_handler( "/panel/notifications_clean", {type: 'friend_accepts'}, true ));
+			$("##{id} .denied").click(notification_handler( "/panel/notifications_clean", {type: 'friend_denies'}, false ));
+			$("##{id} .deleted").click(notification_handler( "/panel/notifications_clean", {type: 'friend_deletes'}, true ));
+			$("##{id} .group-dropped").click(notification_handler( "/panel/notifications_clean", {type: 'group_drops'}, true ));
+			$("##{id} .group-member-added").click(notification_handler( "/panel/notifications_clean", {type: 'group_member_adds'}, true ));
+			$("##{id} .group-member-removed").click(notification_handler( "/panel/notifications_clean", {type: 'group_member_removes'}, true ));
+		})();
+		

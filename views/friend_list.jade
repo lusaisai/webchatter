@@ -1,0 +1,33 @@
+if friends && friends.length > 0
+	for friend in friends
+			button(name="#{friend.name}", email="#{friend.email}", class="friend btn btn-primary" )
+				span #{friend.name} 
+	script.
+		$('.friend').click(function(){
+			var email = $(this).attr('email');
+			var window_exists = false;
+			var that;
+			$('#desktop').find('.talk-to').each(function(){
+				if( $(this).attr('email') == email ) {
+					that = this;
+					window_exists = true;
+					return;
+				}
+			});
+			if (! window_exists) {
+				$.ajax({
+					cache: false,
+					type: "GET",
+					url: "/talk/start",
+					data: { email: email }
+				})
+				.done(function(data){
+					$('#desktop').append(data);
+					$('.window').removeClass('window-fore').addClass('window-back');
+					$("span[email='"+email+"']").closest('.window').removeClass('window-back').addClass('window-fore');
+				});
+			} else {
+				$('.window').removeClass('window-fore').addClass('window-back');
+				$("span[email='"+email+"']").closest('.window').removeClass('window-back').addClass('window-fore');
+			}
+		});

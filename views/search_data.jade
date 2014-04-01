@@ -1,0 +1,54 @@
+ul
+	for user in users
+		li.list-unstyled
+			span.email #{user.email}
+			span.add
+				if (me.friends && me.friends.indexOf(user.email) >= 0)
+					button(type="button", class="btn btn-primary btn-xs", title="He/She is your friend")
+						<span class="glyphicon glyphicon-ok-sign"></span>
+					button(type="button", class="friend-remove btn btn-danger btn-xs", title="Remove him/her from your friend list")
+						<span class="glyphicon glyphicon-remove-sign"></span>
+				else if (user.notifications.friend_requests && user.notifications.friend_requests.indexOf(me.email) >= 0)
+					button(type="button", class="btn btn-primary btn-xs", title="You've requested to be a friend of his/hers")
+						<span class="glyphicon glyphicon-question-sign"></span>
+				else
+					button(type="button", class="friend-request btn btn-primary btn-xs", title="Add as my friend")
+						<span class="glyphicon glyphicon-plus-sign"></span>
+script.
+	$('.friend-request').click(function(){
+		var email = $(this).closest('li').find('.email').text();
+		var that = this;
+		$.ajax({
+			cache: false,
+			type: "POST",
+			url: "/panel/friend_request",
+			data: { email: email }
+		})
+		.done(function() {
+			var Jwindow = $(that).closest('.window');
+			var search_email = $.trim(Jwindow.find('.search').val());
+			Jwindow.find(".result" ).load('/panel/search', {email: search_email});
+		});
+	});
+	$('.friend-remove').click(function(){
+		var email = $(this).closest('li').find('.email').text();
+		var that = this;
+		bootbox.confirm( 'Are you sure to delete ' + email + '?', function(result){
+			if(!result) return;
+			$.ajax({
+				cache: false,
+				type: "POST",
+				url: "/panel/friend_remove",
+				data: { email: email }
+			})
+			.done(function() {
+				var Jwindow = $(that).closest('.window');
+				var search_email = $.trim(Jwindow.find('.search').val());
+				Jwindow.find(".result" ).load('/panel/search', {email: search_email});
+				$('#friend-list').load('/friend_list');
+			});
+		} );
+	});
+
+
+

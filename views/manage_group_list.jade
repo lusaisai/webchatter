@@ -1,0 +1,111 @@
+for group in groups
+	div(class="manage-group" group-name='#{group.name}')
+		button(type="button", method="toggle", class="btn btn-primary btn-xs")
+			span(class="fa fa-plus-circle")
+		span #{group.name}
+		button(type="button", method="add-member", class="btn btn-default btn-xs") Add Member
+		button(type="button", method="drop-group", class="btn btn-danger btn-xs") Drop Group
+		ul(style="display:none")
+			for member in group.members
+				li(email='#{member}')
+					span #{member}
+					button(type="button", method="remove-group-member", class="btn btn-danger btn-xs") Remove
+
+script.
+	$('.manage-group button[method="toggle"]').click(function(){	
+		var Span = $(this).find('span');
+		var Ul = $(this).closest('.manage-group').find('ul');
+		if( Ul.css('display') == 'none' ) {
+			Ul.css('display', 'block');
+			Span.removeClass('fa-plus-circle').addClass('fa-minus-circle');
+		} else {
+			Ul.css('display', 'none');
+			Span.removeClass('fa-minus-circle').addClass('fa-plus-circle');
+		}
+	});
+
+	$("##{id}").on( 'click', '.manage-group button[method="remove-group-member"]', function(){
+		var Group = $(this).closest('.manage-group');
+		var Li = $(this).closest('li');
+
+		bootbox.confirm("Are you sure to remove "+ Li.attr('email') + ' from ' + Group.attr('group-name') + '?', function(result) {
+		if(result){
+			$.ajax({
+				cache: false,
+				type: "DELETE",
+				url: "/panel/group/member",
+				data: { group: Group.attr('group-name'), member: Li.attr('email') }
+			})
+			.done(function(){
+				Li.remove();
+			});
+		}
+		});
+	});
+
+
+	$('.manage-group button[method="drop-group"]').click(function(){
+		var Group = $(this).closest('.manage-group');
+
+		bootbox.confirm("Are you sure to drop group " + Group.attr('group-name') + '?', function(result) {
+		if(result){
+			$.ajax({
+				cache: false,
+				type: "DELETE",
+				url: "/panel/group",
+				data: { name: Group.attr('group-name') }
+			})
+			.done(function(){
+				$('#manage-groups').load('/panel/manage_group_list');
+			});
+		}
+		});
+	});
+
+	$('.manage-group button[method="add-member"]').click(function(){
+		var Span = $(this).closest('.manage-group').find('button[method="toggle"] span');
+		var Ul = $(this).closest('.manage-group').find('ul');
+		if( Ul.css('display') == 'none' ) {
+			Ul.css('display', 'block');
+			Span.removeClass('fa-plus-circle').addClass('fa-minus-circle');
+		}
+		Ul.prepend('<li class="form-inline add-member-form"><input type="text" placeholder="user email" class="form-control"><button class="btn btn-default" type="cancel">Cancel</button><button class="btn btn-primary" type="submit">Submit</button></li>');
+
+		$.get('/panel/all_user_emails', function(data){
+			Ul.find('input').typeahead({source: data});
+		});
+	});
+
+
+	$("##{id}").on('click', '.add-member-form button[type="cancel"]', function(){
+		$(this).closest('li.add-member-form').remove();
+	});
+
+
+	$("##{id}").on('click', '.add-member-form button[type="submit"]', function(){
+		var group = $(this).closest('div.manage-group').attr('group-name');
+		var Li = $(this).closest('li.add-member-form');
+		var text = $.trim(Li.find('input').val());
+		if(text=="") return;
+		$.ajax({
+			cache: false,
+			type: "POST",
+			url: '/panel/group/add_member',
+			data: {member: text, group: group}
+		})
+		.done(function(data) {
+			var existed = false;
+			Li.siblings().each(function(){
+				if( $(this).attr('email') == text ) {
+					existed = true;
+					return;
+				}
+			});
+			if( ! existed ) Li.before('<li>' + text +'<button class="btn btn-danger btn-xs" method="remove-group-member" type="button">Remove</button></li>');
+			Li.remove();
+		})
+		;
+
+	});
+
+
