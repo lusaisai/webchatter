@@ -37,7 +37,7 @@
 	overflow-y: scroll;
 }
 
-.friend {
+.friend, .group {
 	width: 100%;
 }
 

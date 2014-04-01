@@ -1,0 +1,33 @@
+if groups && groups.length > 0
+	for group in groups
+			button(name="#{group.name}" class="group item btn btn-default" )
+				span #{group.name} 
+	script.
+		$('.group').click(function(){
+			var name = $(this).attr('name');
+			var window_exists = false;
+			var that;
+			$('#desktop').find('.talk-to').each(function(){
+				if( $(this).attr('name') == name ) {
+					that = this;
+					window_exists = true;
+					return;
+				}
+			});
+			if (! window_exists) {
+				$.ajax({
+					cache: false,
+					type: "GET",
+					url: "/talk/start_group",
+					data: { name: name }
+				})
+				.done(function(data){
+					$('#desktop').append(data);
+					$('.window').removeClass('window-fore').addClass('window-back');
+					$("span[name='"+name+"']").closest('.window').removeClass('window-back').addClass('window-fore');
+				});
+			} else {
+				$('.window').removeClass('window-fore').addClass('window-back');
+				$("span[name='"+name+"']").closest('.window').removeClass('window-back').addClass('window-fore');
+			}
+		});

@@ -1,6 +1,6 @@
 if friends && friends.length > 0
 	for friend in friends
-			button(name="#{friend.name}", email="#{friend.email}", class="friend btn btn-primary" )
+			button(name="#{friend.name}", email="#{friend.email}", class="friend item btn btn-primary" )
 				span #{friend.name} 
 	script.
 		$('.friend').click(function(){

@@ -31,9 +31,16 @@ block content
 						span(class="fa fa-sign-out")
 			div(id="friends" class="panel panel-primary")
 				div.panel-heading
-					input(type="text", id="filter", class="form-control")
+					div Friends
+					input(type="text", class="filter", class="form-control")
 				div.panel-body#friend-list
 					include friend_list.jade
+			div(id="groups" class="panel panel-primary")
+				div.panel-heading
+					div Groups
+					input(type="text", class="filter", class="form-control")
+				div.panel-body#group-list
+					include group_list.jade
 			audio(id="note-sound" style="display:none")
 				source(src="/sound/notification.mp3", type="audio/mpeg")
 				source(src="/sound/notification.ogg", type="audio/ogg")
@@ -43,12 +50,12 @@ block content
 
 	script(type="text/javascript", src="/javascripts/live.js")
 	script.
-		$('#filter').keyup(function(){
+		$('.filter').keyup(function(){
 			var text = $.trim($(this).val());
-			var Friends = $("#user-panel .friend");
-			Friends.css('display', 'block');
+			var Items = $(this).closest('.panel').find('.panel-body .item');
+			Items.css('display', 'block');
 			if( text != "" ) {
-				Friends.each(function(){
+				Items.each(function(){
 					if( $(this).attr('name').indexOf(text) < 0 ) {
 						$(this).css('display', 'none');
 					}
