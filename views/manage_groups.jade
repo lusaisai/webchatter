@@ -28,6 +28,7 @@ block body
 				})
 				.done(function(data) {
 					$('#manage-groups').load('/panel/manage_group_list');
+					$('#group-list').load('/group_list');
 					Form.remove();
 				})
 				.fail(function( jqXHR, textStatus, errorThrown){

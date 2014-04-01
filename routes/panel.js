@@ -71,7 +71,7 @@ exports.remove_group_member = function (req, res) {
 	var member = req.body.member;
 	var groups = db.collection('groups');
 	var users = db.collection('users');
-	groups.update( {group: group}, { $pull: { members: member } }, function (err, result) {
+	groups.update( {name: group}, { $pull: { members: member } }, function (err, result) {
 		if ( err ) {
 			res.send(500);
 		} else {

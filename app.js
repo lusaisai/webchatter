@@ -41,6 +41,7 @@ if ( true || 'development' == app.get('env')) {
 // routes
 app.get('/', user.check_signin, routes.index);
 app.get('/friend_list', user.check_signin, routes.friend_list);
+app.get('/group_list', user.check_signin, routes.group_list);
 
 app.get('/panel/search', panel.search_index);
 app.get('/panel/all_user_emails', user.check_signin, panel.all_user_emails);
@@ -60,7 +61,10 @@ app.post('/panel/notifications_clean', user.check_signin, panel.notifications_cl
 app.get('/talk/start', user.check_signin, talk.start);
 app.post('/talk/live', user.check_signin, talk.live);
 app.delete('/talk/live', user.check_signin, talk.delete);
+app.delete('/grouptalk/live', user.check_signin, talk.group_message_delete);
 app.post('/talkto/:email', user.check_signin, talk.talkto);
+app.post('/talktogroup/:name', user.check_signin, talk.talktogroup);
+app.get('/talk/start_group', user.check_signin, talk.start_group);
 
 app.get('/signup', user.signup_index);
 app.get('/signin', user.signin_index);

@@ -1,6 +1,6 @@
 if groups && groups.length > 0
 	for group in groups
-			button(name="#{group.name}" class="group item btn btn-default" )
+			button(name="#{group.name}", class="group item btn btn-default" )
 				span #{group.name} 
 	script.
 		$('.group').click(function(){

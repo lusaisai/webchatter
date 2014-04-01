@@ -60,7 +60,7 @@ block body
 
 	script.
 		(function(){
-			var notification_handler = function( url, other_data, refresh_friend_list ) {
+			var notification_handler = function( url, other_data, refresh_friend_list, refresh_group_list) {
 				return function(){
 					var Item = $(this).closest('div.notification-item');
 					var email = Item.find('span').text();
@@ -75,6 +75,7 @@ block body
 					.done(function() {
 						Item.remove();
 						if(refresh_friend_list) $('#friend-list').load('/friend_list');
+						if(refresh_group_list) $('#group-list').load('/group_list');
 					});
 				};
 			};
@@ -82,11 +83,11 @@ block body
 			$("##{id} .accept-request").click(notification_handler( "/panel/handle_friend_request", {accept_friend: true}, true ));
 			$("##{id} .deny-request").click(notification_handler( "/panel/handle_friend_request", {accept_friend: false}, false ));
 			
-			$("##{id} .accepted").click(notification_handler( "/panel/notifications_clean", {type: 'friend_accepts'}, true ));
-			$("##{id} .denied").click(notification_handler( "/panel/notifications_clean", {type: 'friend_denies'}, false ));
-			$("##{id} .deleted").click(notification_handler( "/panel/notifications_clean", {type: 'friend_deletes'}, true ));
-			$("##{id} .group-dropped").click(notification_handler( "/panel/notifications_clean", {type: 'group_drops'}, true ));
-			$("##{id} .group-member-added").click(notification_handler( "/panel/notifications_clean", {type: 'group_member_adds'}, true ));
-			$("##{id} .group-member-removed").click(notification_handler( "/panel/notifications_clean", {type: 'group_member_removes'}, true ));
+			$("##{id} .accepted").click(notification_handler( "/panel/notifications_clean", {type: 'friend_accepts'}, true, false ));
+			$("##{id} .denied").click(notification_handler( "/panel/notifications_clean", {type: 'friend_denies'}, false, false ));
+			$("##{id} .deleted").click(notification_handler( "/panel/notifications_clean", {type: 'friend_deletes'}, true, false ));
+			$("##{id} .group-dropped").click(notification_handler( "/panel/notifications_clean", {type: 'group_drops'}, false, true ));
+			$("##{id} .group-member-added").click(notification_handler( "/panel/notifications_clean", {type: 'group_member_adds'}, false, true ));
+			$("##{id} .group-member-removed").click(notification_handler( "/panel/notifications_clean", {type: 'group_member_removes'}, false, true ));
 		})();
 		

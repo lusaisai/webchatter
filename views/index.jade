@@ -63,19 +63,34 @@ block content
 			}
 		});
 		$('#search-user').click(function(){
-			$.get( '/panel/search', function(data){
+			$.ajax({
+				cache: false,
+				type: "GET",
+				url: '/panel/search'
+			})
+			.done(function(data) {
 				$('#desktop').append(data);
-			} );
+			});
 		});
 
 		$('#notifications').click(function(){
-			$.get( '/panel/notifications', function(data){
+			$.ajax({
+				cache: false,
+				type: "GET",
+				url: '/panel/notifications'
+			})
+			.done(function(data) {
 				$('#desktop').append(data);
-			} );
+			});
 		});
 
 		$('#groups').click(function(){
-			$.get( '/panel/manage_groups', function(data){
+			$.ajax({
+				cache: false,
+				type: "GET",
+				url: '/panel/manage_groups'
+			})
+			.done(function(data) {
 				$('#desktop').append(data);
-			} );
+			});
 		});

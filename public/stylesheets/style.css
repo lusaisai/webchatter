@@ -36,6 +36,10 @@
 	max-height: 800px;
 	overflow-y: scroll;
 }
+#groups {
+	max-height: 800px;
+	overflow-y: scroll;
+}
 
 .friend, .group {
 	width: 100%;
