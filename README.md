@@ -1,7 +1,7 @@
 webchatter
 ==========
 
-Web chat app for you local net work
+Web chat app for your local net work
 
 Usage
 -----
