@@ -3,10 +3,46 @@ extends window
 block title
 	span(class="talk-to" name="#{friend.name}" email="#{friend.email}") Conversation with #{friend.name}
 
+block other_controls
+	button(type="button", title='load conversation history', class="friend-conversation-history btn btn-info btn-xs")
+		<span class="fa fa-file-text"></span>
+	script.
+		$('##{id} .friend-conversation-history').click(function(){
+			var that = this;
+			var last_talk_time = $( "##{id} .messages h6" ).attr('post-time');
+			if(!last_talk_time) last_talk_time = new Date().toISOString();
+			$.ajax({
+				type: "POST",
+				url: "/talk/history",
+				data: {user1: '#{me.email}', user2: '#{friend.email}', last_talk_time: last_talk_time}
+			})
+			.done(function(data) {
+				if(data.length == 0){ $(that).addClass('disabled'); return;}
+				var time = new Date();
+				var Messages = $( "##{id} .messages" );
+				for( var i = 0; i < data.length; i++){
+					var user;
+					if( data[i].from == '#{me.email}' ) {
+						user = '#{me.name}';
+					} else {
+						user = '#{friend.name}';
+					}
+					if( user == '#{me.name}' ) {
+						Messages.prepend( '<p class="my-text #{me.name}-text">' + data[i].message + "</p>" );
+					} else {
+						Messages.prepend( '<p class="your-text #{friend.name}-text">' + data[i].message + "</p>" );
+					}
+					Messages.prepend( '<h6 post-time="' + data[i].time +'">' + format_time( new Date(data[i].time) ) + ' ' + user + " says:" + '</h6>' );
+					
+				}
+				Messages.animate({ scrollTop: 0 }, 'fast');
+			});
+		});
+
 block body
 	div.messages
 		for message in messages
-			h6 #{message.time} #{friend.name} says: 
+			h6(post-time="#{message.time}") #{message.format_time} #{friend.name} says: 
 			p(class="your-text #{friend.name}-text") #{message.message}
 
 	script.
@@ -36,12 +72,12 @@ block body
 				data: {message: message}
 			})
 			.done(function() {
-				Messages.append( '<h6>' + format_time(new Date()) + ' ' + "#{me.name} says:" + '</h6>' );
+				var time = new Date();
+				Messages.append( '<h6 post-time="' + time.toISOString() +'">' + format_time(time) + ' ' + "#{me.name} says:" + '</h6>' );
 				Messages.append( '<p class="my-text #{me.name}-text">' + message + "</p>" );
 				Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
 			})
 			.fail(function() {
-				var time = new Date();
 				Messages.append( '<p class="fail-text"> failed to send: ' + message + "</p>" );
 				Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
 			})
@@ -52,10 +88,10 @@ block body
 
 		var format_time = function(t) {
 			var time = t.getFullYear();
-			if ( t.getMonth() < 10 ) {time = time + '-0' + t.getMonth() } 
-			else { time = time + '-' + t.getMonth() }
-			if ( t.getDay() < 10 ) {time = time + '-0' + t.getDay() } 
-			else { time = time + '-' + t.getDay() }
+			if ( ( t.getMonth()+1 ) < 10 ) {time = time + '-0' + ( t.getMonth()+1 ) } 
+			else { time = time + '-' + ( t.getMonth()+1 ) }
+			if ( t.getDate() < 10 ) {time = time + '-0' + t.getDate() } 
+			else { time = time + '-' + t.getDate() }
 
 			if ( t.getHours() < 10 ) {time = time + ' 0' + t.getHours() } 
 			else { time = time + ' ' + t.getHours() }

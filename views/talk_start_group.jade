@@ -4,16 +4,45 @@ block title
 	span(class="talk-to-group", name="#{group.name}") Conversation in #{group.name}
 
 block other_controls
+	button(type="button", title='load conversation history', class="group-conversation-history btn btn-info btn-xs")
+		<span class="fa fa-file-text"></span>
+	script.
+		$('##{id} .group-conversation-history').click(function(){
+			var that = this;
+			var last_talk_time = $( "##{id} .messages h6" ).attr('post-time');
+			if(!last_talk_time) last_talk_time = new Date().toISOString();
+			$.ajax({
+				type: "POST",
+				url: "/grouptalk/history",
+				data: {name:'#{group.name}', last_talk_time: last_talk_time}
+			})
+			.done(function(data) {
+				if(data.length == 0){ $(that).addClass('disabled'); return;}
+				var time = new Date();
+				var Messages = $( "##{id} .messages" );
+				for( var i = 0; i < data.length; i++){
+					if( data[i].from_name == '#{me.name}' ) {
+						Messages.prepend( '<p class="my-text ' + data[i].from_name + '-text">' + data[i].message + "</p>" );
+					} else {
+						Messages.prepend( '<p class="your-text ' + data[i].from_name + '-text">' + data[i].message + "</p>" );
+					}
+					Messages.prepend( '<h6 post-time="' + data[i].time +'">' + format_time( new Date(data[i].time) ) + ' ' + data[i].from_name + " says:" + '</h6>' );
+					
+				}
+				Messages.animate({ scrollTop: 0 }, 'fast');
+			});
+		});
+
 	- var members = group.members.join("<br/>");
 	button(type="button", data-container="body", data-toggle="popover", data-content="#{members}", class="group-member-list btn btn-info btn-xs")
 		<span class="glyphicon glyphicon-list"></span>
 	script.
-		$('.group-member-list').popover({html:true, placement: 'left', title: 'Group Members'});
+		$('##{id} .group-member-list').popover({html:true, placement: 'left', title: 'Group Members'});
 
 block body
 	div.messages
 		for message in messages
-			h6 #{message.time} #{message.from_name} says: 
+			h6(post-time="#{message.time}") #{message.format_time} #{message.from_name} says: 
 			p(class="your-text #{group.name}-text") #{message.message}
 
 	script.
@@ -43,12 +72,12 @@ block body
 				data: {message: message}
 			})
 			.done(function() {
-				Messages.append( '<h6>' + format_time(new Date()) + ' ' + "#{me.name} says:" + '</h6>' );
+				var time = new Date();
+				Messages.append( '<h6 post-time="' + time.toISOString() +'">' + format_time(time) + ' ' + "#{me.name} says:" + '</h6>' );
 				Messages.append( '<p class="my-text #{me.name}-text">' + message + "</p>" );
 				Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
 			})
 			.fail(function() {
-				var time = new Date();
 				Messages.append( '<p class="fail-text"> failed to send: ' + message + "</p>" );
 				Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
 			})
@@ -59,10 +88,10 @@ block body
 
 		var format_time = function(t) {
 			var time = t.getFullYear();
-			if ( t.getMonth() < 10 ) {time = time + '-0' + t.getMonth() } 
-			else { time = time + '-' + t.getMonth() }
-			if ( t.getDay() < 10 ) {time = time + '-0' + t.getDay() } 
-			else { time = time + '-' + t.getDay() }
+			if ( ( t.getMonth()+1 ) < 10 ) {time = time + '-0' + ( t.getMonth()+1 ) } 
+			else { time = time + '-' + ( t.getMonth()+1 ) }
+			if ( t.getDate() < 10 ) {time = time + '-0' + t.getDate() } 
+			else { time = time + '-' + t.getDate() }
 
 			if ( t.getHours() < 10 ) {time = time + ' 0' + t.getHours() } 
 			else { time = time + ' ' + t.getHours() }

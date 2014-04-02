@@ -23,6 +23,48 @@ exports.live = function (req, res) {
 	});
 };
 
+exports.talk_history = function (req, res) {
+	var user1 = req.body.user1;
+	var user2 = req.body.user2;
+	var last_talk_time = req.body.last_talk_time;
+
+	var message_histories = db.collection('message_histories');
+	message_histories.find( 
+			{
+			$or: [ 
+				{ from: user1, to: user2, time: {$lt: new Date(last_talk_time)} },
+				{ from: user2, to: user1, time: {$lt: new Date(last_talk_time)} }
+				 ] 
+			}, 
+			{limit: 50, sort: [['time', -1]] } 
+		).toArray(function (err, docs) {
+		if (err) {
+			res.send(500);
+		} else{
+			res.send(docs);
+		}
+	});
+};
+
+exports.grouptalk_history = function (req, res) {
+	var name = req.body.name;
+	var last_talk_time = req.body.last_talk_time;
+
+	var group_message_histories = db.collection('group_message_histories');
+	group_message_histories.find( 
+			{ to: name, time: {$lt: new Date(last_talk_time)} },
+			{limit: 50, sort: [['time', -1]] } 
+		).toArray(function (err, docs) {
+		if (err) {
+			res.send(500);
+		} else{
+			res.send(docs);
+		}
+	});
+};
+
+
+
 exports.delete = function (req, res) {
 	var id_to_delete = req.body.id_to_delete;
 	var object_ids = [];
@@ -126,7 +168,7 @@ var opened_window_messages = function (req, res, next) {
 	messages.find({to: req.user.email, from: {$in: opened_emails}}, {sort: [['from', 1],['time', 1]]}).toArray(function(err, docs){
 		if ( docs ) {
 			for (var i = 0; i < docs.length; i++) {
-				docs[i].time = format_time(docs[i].time);
+				docs[i].format_time = format_time(docs[i].time);
 			}
 			res.data.opened_window_users = docs;
 		}
@@ -138,7 +180,7 @@ var opened_window_messages = function (req, res, next) {
 			}
 			group_messages.find({ $and: [ {to: {$in: groups}}, { not_received: req.user.email } ] }, {sort: [['time', 1]], fields:{not_received: 0} }).toArray(function(err, docs){
 				for (var i = 0; i < docs.length; i++) {
-					docs[i].time = format_time(docs[i].time);
+					docs[i].format_time = format_time(docs[i].time);
 				}
 				res.data.opened_window_groups = docs;
 				next();
@@ -199,10 +241,10 @@ exports.start_group = function(req, res) {
 
 var format_time = function(t) {
 	var time = t.getFullYear();
-	if ( t.getMonth() < 10 ) {time = time + '-0' + t.getMonth() } 
-	else { time = time + '-' + t.getMonth() }
-	if ( t.getDay() < 10 ) {time = time + '-0' + t.getDay() } 
-	else { time = time + '-' + t.getDay() }
+	if ( ( t.getMonth()+1 ) < 10 ) {time = time + '-0' + ( t.getMonth()+1 ) } 
+	else { time = time + '-' + ( t.getMonth()+1 ) }
+	if ( t.getDate() < 10 ) {time = time + '-0' + t.getDate() } 
+	else { time = time + '-' + t.getDate() }
 
 	if ( t.getHours() < 10 ) {time = time + ' 0' + t.getHours() } 
 	else { time = time + ' ' + t.getHours() }
@@ -220,7 +262,7 @@ var start_messages = function (req, res, next) {
 	var messages = db.collection('messages');
 	messages.find({ from: email, to: req.user.email}, {sort: [['time', 1]]}).toArray(function(err, docs){
 		for (var i = 0; i < docs.length; i++) {
-			docs[i].time = format_time(docs[i].time);
+			docs[i].format_time = format_time(docs[i].time);
 		}
 		req.messages = docs;
 		next();
@@ -233,7 +275,7 @@ var start_group_messages = function (req, res, next) {
 	var messages = db.collection('group_messages');
 	messages.find({ $and: [ {to: name}, { not_received: req.user.email } ] }, {sort: [['time', 1]]}).toArray(function(err, docs){
 		for (var i = 0; i < docs.length; i++) {
-			docs[i].time = format_time(docs[i].time);
+			docs[i].format_time = format_time(docs[i].time);
 		}
 		req.messages = docs;
 		next();
@@ -277,7 +319,7 @@ exports.talktogroup = function (req, res) {
 				if ( err ) {res.send(500);}
 				else {
 					res.send(200);
-					message_histories.save({ to: name, from: req.user.email, message: message, time: new Date() }, function(){});
+					message_histories.save({ to: name, from: req.user.email, from_name: req.user.name, message: message, time: new Date() }, function(){});
 				}
 			});
 		}	    	

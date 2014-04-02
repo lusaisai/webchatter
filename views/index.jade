@@ -10,7 +10,7 @@ block content
 					span(class="fa fa-search")
 				button(id="notifications" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-default", title="Notifications")
 					span(class="fa fa-envelope")
-				button(id="manage-groups" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-default", title="Manage Groups")
+				button(id="start-manage-groups" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-default", title="Manage Groups")
 					span(class="fa fa-group")
 				button(id="set-note-sound", data-play="true" type="button", data-toggle="tooltip", data-placement="bottom",class="btn btn-default", title="Click to disable sound notification")
 					span(class="fa fa-volume-up")
@@ -84,7 +84,7 @@ block content
 			});
 		});
 
-		$('#manage-groups').click(function(){
+		$('#start-manage-groups').click(function(){
 			$.ajax({
 				cache: false,
 				type: "GET",

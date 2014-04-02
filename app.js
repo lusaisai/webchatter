@@ -20,7 +20,6 @@ app.set('host', '0.0.0.0');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.set('appname', 'WebChatter');
-app.locals.pretty = true;
 
 // app.use(express.favicon());
 app.use(express.logger('dev'));
@@ -64,6 +63,8 @@ app.delete('/talk/live', user.check_signin, talk.delete);
 app.delete('/grouptalk/live', user.check_signin, talk.group_message_delete);
 app.post('/talkto/:email', user.check_signin, talk.talkto);
 app.post('/talktogroup/:name', user.check_signin, talk.talktogroup);
+app.post('/talk/history', user.check_signin, talk.talk_history);
+app.post('/grouptalk/history', user.check_signin, talk.grouptalk_history);
 app.get('/talk/start_group', user.check_signin, talk.start_group);
 
 app.get('/signup', user.signup_index);

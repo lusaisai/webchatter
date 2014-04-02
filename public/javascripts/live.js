@@ -65,7 +65,7 @@ $(function() {
 					Window.addClass('window-note');
 				}
 				    	
-				Messages.append('<h6>' + message.time + ' ' + friend_name + " says:" + '</h6>');
+				Messages.append('<h6 post-time="' + message.time + '">' + message.format_time + ' ' + friend_name + " says:" + '</h6>');
 				Messages.append('<p class="your-text ' + friend_name + '-text">' + message.message + "</p>");
 				Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
 				id_to_delete.push(message._id);
@@ -99,7 +99,7 @@ $(function() {
 					Window.addClass('window-note');
 				}
 				    	
-				Messages.append('<h6>' + message.time + ' ' + message.from_name + " says:" + '</h6>');
+				Messages.append('<h6 post-time="' + message.time + '">' + message.format_time + ' ' + message.from_name + " says:" + '</h6>');
 				Messages.append('<p class="your-text ' + message.from_name + '-text">' + message.message + "</p>");
 				Messages.animate({ scrollTop: Messages.prop("scrollHeight") - Messages.height() }, 'fast');
 				id_to_pull.push(message._id);
