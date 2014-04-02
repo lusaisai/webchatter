@@ -51,12 +51,12 @@ block content
 	script(type="text/javascript", src="/javascripts/live.js")
 	script.
 		$('.filter').keyup(function(){
-			var text = $.trim($(this).val());
+			var text = $.trim($(this).val()).toLowerCase();
 			var Items = $(this).closest('.panel').find('.panel-body .item');
 			Items.css('display', 'block');
 			if( text != "" ) {
 				Items.each(function(){
-					if( $(this).attr('name').indexOf(text) < 0 ) {
+					if( $(this).attr('name').toLowerCase().indexOf(text) < 0 ) {
 						$(this).css('display', 'none');
 					}
 				});
